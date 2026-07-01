@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power Cloud AWS RDS Demo</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:40px;
+    background:#f4f4f4;
+}
+
+.container{
+    width:700px;
+    margin:auto;
+    background:#fff;
+    padding:20px;
+    border-radius:8px;
+    box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+h1{
+    text-align:center;
+}
+
+.section{
+    margin-top:25px;
+}
+
+input{
+    width:95%;
+    padding:10px;
+    margin-top:10px;
+}
+
+button{
+    padding:10px 20px;
+    margin-top:10px;
+    cursor:pointer;
+    background:#007BFF;
+    color:white;
+    border:none;
+    border-radius:5px;
+}
+
+button:hover{
+    background:#0056b3;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+
+table,th,td{
+    border:1px solid black;
+}
+
+th,td{
+    padding:10px;
+    text-align:center;
+}
+
+ul{
+    padding-left:20px;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Power Cloud AWS-RDS Demo</h1>
+
+<div class="section">
+
+<h2>Create Table</h2>
+
+<input type="text" id="tableName" placeholder="Enter Table Name">
+
+<button onclick="createTable()">Create Table</button>
+
+</div>
+
+<div class="section">
+
+<h2>Insert Data</h2>
+
+<input type="text" id="insertTable" placeholder="Table Name">
+
+<input type="text" id="name" placeholder="Name">
+
+<input type="email" id="email" placeholder="Email">
+
+<button onclick="insertData()">Insert Data</button>
+
+</div>
+
+<div class="section">
+
+<h2>Available Tables</h2>
+
+<button onclick="fetchTables()">Fetch Table Names</button>
+
+<ul id="tableList"></ul>
+
+</div>
+
+<div class="section">
+
+<h2>View Table Data</h2>
+
+<input type="text" id="viewTable" placeholder="Enter Table Name">
+
+<button onclick="viewData()">View Data</button>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+
+</tr>
+
+</thead>
+
+<tbody id="tableBody"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script>
+
+function createTable(){
+
+let table=document.getElementById("tableName").value;
+
+fetch("create_table.php?name="+table)
+
+.then(response=>response.text())
+
+.then(data=>alert(data))
+
+.catch(err=>alert(err));
+
+}
+
+function insertData(){
+
+let formData=new FormData();
+
+formData.append("table",document.getElementById("insertTable").value);
+formData.append("name",document.getElementById("name").value);
+formData.append("email",document.getElementById("email").value);
+
+fetch("insert_data.php",{
+
+method:"POST",
+body:formData
+
+})
+
+.then(response=>response.text())
+
+.then(data=>alert(data))
+
+.catch(err=>alert(err));
+
+}
+
+function fetchTables(){
+
+fetch("fetch_table_names.php")
+
+.then(response=>response.json())
+
+.then(data=>{
+
+let list=document.getElementById("tableList");
+
+list.innerHTML="";
+
+data.forEach(function(table){
+
+list.innerHTML+="<li>"+table+"</li>";
+
+});
+
+});
+
+}
+
+function viewData(){
+
+let table=document.getElementById("viewTable").value;
+
+fetch("fetch_data.php?table="+table)
+
+.then(response=>response.json())
+
+.then(data=>{
+
+let body=document.getElementById("tableBody");
+
+body.innerHTML="";
+
+data.forEach(function(row){
+
+body.innerHTML+=`
+
+<tr>
+
+<td>${row.id}</td>
+
+<td>${row.name}</td>
+
+<td>${row.email}</td>
+
+</tr>
+
+`;
+
+});
+
+});
+
+}
+
+</script>
+
+</body>
+</html>
